@@ -6,6 +6,7 @@ fn main() {
 
     println!("Type 'exit' to quit the shell.");
 
+
     loop {
         print!("> ");
         io::stdout().flush().unwrap();
@@ -18,7 +19,8 @@ fn main() {
         if command == "exit" {
             break;
         }
-        match Command::new(command).status(){
+        let commands = command.split_whitespace().collect::<Vec<&str>>();
+        match Command::new(commands[0]).args(&commands[1..]).status(){
             Ok(_) => (),
             Err(_) => println!("qorvix: Command not found"),
         }
