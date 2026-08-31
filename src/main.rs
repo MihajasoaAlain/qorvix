@@ -1,3 +1,6 @@
+mod build_ins;
+use crate::build_ins::check::BuildInCommand;
+use build_ins::cd;
 use std::io::{self, Write};
 use std::process::Command;
 
@@ -15,25 +18,26 @@ fn main() {
         io::stdin().read_line(&mut input).unwrap();
 
         let command = input.trim();
-
-        if command == "exit" {
-            break;
-        }
-        if command.starts_with("cd ") {
-            let path = command[3..].trim();
-            if let Err(e) = std::env::set_current_dir(path) {
-                eprintln!("qorvix: cd: {}: {}", path, e);
-            }
-            continue;
-        }
         let commands = command.split_whitespace().collect::<Vec<&str>>();
-        match Command::new(commands[0]).args(&commands[1..]).status() {
-            Ok(_) => (),
-            Err(_) => {
-                if let Err(_) = std::env::set_current_dir(commands[0]) {
-                    eprintln!("qorvix: Command not found: {}", commands[0]);
+        let command_type = BuildInCommand::from(commands[0]);
+
+        match command_type {
+            BuildInCommand::Exit => break,
+            BuildInCommand::Cd => {
+                let path = command[3..].trim();
+                if cd(path).is_err() {
+                    eprintln!("Failed to change directory");
                 }
+                continue;
             }
+            BuildInCommand::Other(cmd) => match Command::new(cmd).args(&commands[1..]).status() {
+                Ok(_) => (),
+                Err(_) => {
+                    if cd(commands[0]).is_err() {
+                        eprintln!("Command not found");
+                    }
+                }
+            },
         }
     }
 }
