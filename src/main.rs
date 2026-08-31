@@ -1,4 +1,6 @@
 use std::io::{self, Write};
+use std::process::Command;
+
 fn main() {
     println!("Qorvix Shell");
 
@@ -16,6 +18,9 @@ fn main() {
         if command == "exit" {
             break;
         }
+        Command::new(command)
+            .status()
+            .unwrap();
 
     }
 }
