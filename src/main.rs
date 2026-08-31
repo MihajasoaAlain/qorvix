@@ -18,9 +18,9 @@ fn main() {
         if command == "exit" {
             break;
         }
-        Command::new(command)
-            .status()
-            .unwrap();
-
+        match Command::new(command).status(){
+            Ok(_) => (),
+            Err(_) => println!("qorvix: Command not found"),
+        }
     }
 }
