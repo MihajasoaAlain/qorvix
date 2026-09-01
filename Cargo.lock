@@ -3,14 +3,5 @@
 version = 4
 
 [[package]]
-name = "check"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89beada3dfaf43501b20ab69f1d1dd2d43b4a600eb16ca05ea0e093a100634b1"
-
-[[package]]
 name = "qorvix"
 version = "0.1.0"
-dependencies = [
- "check",
-]
