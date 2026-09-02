@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use std::process::Command;
 
-use crate::build_ins::{cd, parser, ParsedCommand};
+use crate::build_ins::{cd, parser};
 use crate::build_ins::check::BuildInCommand;
 
 pub fn intro(greetings: &str, info: &str) {
