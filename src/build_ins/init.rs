@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 use std::process::Command;
 
-use crate::build_ins::cd;
+use crate::build_ins::{cd, parser, ParsedCommand};
 use crate::build_ins::check::BuildInCommand;
 
 pub fn intro(greetings: &str, info: &str) {
@@ -10,40 +10,45 @@ pub fn intro(greetings: &str, info: &str) {
 
 pub fn execute_command() {
     loop {
-        let input = pwd();
-        let command = input.trim();
-        let commands = command.split_whitespace().collect::<Vec<&str>>();
-        let command_type = BuildInCommand::from(commands[0]);
-        match command_type {
+        let input = user_command();
+
+        let parsed_command = match parser::parse(input) {
+            Some(cmd) => cmd,
+            None => continue,
+        };
+
+        // let command = input.trim();
+        // let commands = command.split_whitespace().collect::<Vec<&str>>();
+        match parsed_command.program {
             BuildInCommand::Exit => break,
             BuildInCommand::Cd => {
-                if commands.len() > 2 {
-                    eprintln!("{}: string not in pwd: {}", commands[0], commands[1]);
+                if parsed_command.arguments.len() > 2 {
+                    eprintln!("{:?}: string not in pwd: {}", parsed_command.program, parsed_command.arguments.join(" "));
                     continue;
                 }
-                if commands.len() == 1 {
+                if parsed_command.arguments.is_empty() {
                     if cd("/").is_err() {
-                        eprintln!("{}: failed to change directory", commands[0]);
+                        eprintln!("{}: failed to change directory", parsed_command.program);
                     }
                     continue;
                 }
-                let path = commands[1];
-                if cd(path).is_err() {
-                    eprintln!("{}: failed to change directory", commands[0]);
+                let path = parsed_command.arguments[0].clone();
+                if cd(path.as_str()).is_err() {
+                    eprintln!("{}: failed to change directory", parsed_command.program);
                 }
                 continue;
             }
-            BuildInCommand::Other(cmd) => match Command::new(cmd).args(&commands[1..]).status() {
+            BuildInCommand::Other(ref cmd) => match Command::new(cmd).args(&parsed_command.arguments).status() {
                 Ok(_) => (),
                 Err(_) => {
-                    eprintln!("{}: command not found", commands[0]);
+                    eprintln!("{}: command not found", parsed_command.program);
                 }
             },
         }
     }
 }
 
-pub fn pwd() -> String {
+pub fn user_command() -> String {
     let current_dir = Command::new("pwd").output().unwrap().stdout;
     print!("{} > ", String::from_utf8(current_dir).unwrap().trim());
     io::stdout().flush().unwrap();
