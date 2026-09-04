@@ -1,8 +1,8 @@
 use std::io::{self, Write};
 use std::process::Command;
 
-use crate::build_ins::{cd, parser};
 use crate::build_ins::check::BuildInCommand;
+use crate::build_ins::{cd, parser};
 
 pub fn intro(greetings: &str, info: &str) {
     println!("{}\n{}", greetings, info);
@@ -23,7 +23,11 @@ pub fn execute_command() {
             BuildInCommand::Exit => break,
             BuildInCommand::Cd => {
                 if parsed_command.arguments.len() > 2 {
-                    eprintln!("{:?}: string not in pwd: {}", parsed_command.program, parsed_command.arguments.join(" "));
+                    eprintln!(
+                        "{:?}: string not in pwd: {}",
+                        parsed_command.program,
+                        parsed_command.arguments.join(" ")
+                    );
                     continue;
                 }
                 if parsed_command.arguments.is_empty() {
@@ -38,12 +42,14 @@ pub fn execute_command() {
                 }
                 continue;
             }
-            BuildInCommand::Other(ref cmd) => match Command::new(cmd).args(&parsed_command.arguments).status() {
-                Ok(_) => (),
-                Err(_) => {
-                    eprintln!("{}: command not found", parsed_command.program);
+            BuildInCommand::Other(ref cmd) => {
+                match Command::new(cmd).args(&parsed_command.arguments).status() {
+                    Ok(_) => (),
+                    Err(_) => {
+                        eprintln!("{}: command not found", parsed_command.program);
+                    }
                 }
-            },
+            }
         }
     }
 }

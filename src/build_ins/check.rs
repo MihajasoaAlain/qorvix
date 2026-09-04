@@ -1,3 +1,4 @@
+use crate::build_ins::Token;
 use std::fmt::Display;
 
 #[derive(Debug)]
@@ -12,6 +13,14 @@ impl From<&str> for BuildInCommand {
             "cd" => BuildInCommand::Cd,
             "exit" => BuildInCommand::Exit,
             _ => BuildInCommand::Other(s.to_string()),
+        }
+    }
+}
+impl From<Token> for BuildInCommand {
+    fn from(token: Token) -> Self {
+        match token {
+            Token::Word(s) => BuildInCommand::from(s.as_str()),
+            _ => BuildInCommand::Other(String::new()),
         }
     }
 }
