@@ -1,4 +1,5 @@
 use std::fmt::Display;
+use crate::build_ins::Token;
 
 #[derive(Debug)]
 pub enum BuildInCommand {
@@ -12,6 +13,14 @@ impl From<&str> for BuildInCommand {
             "cd" => BuildInCommand::Cd,
             "exit" => BuildInCommand::Exit,
             _ => BuildInCommand::Other(s.to_string()),
+        }
+    }
+}
+impl From<Token> for BuildInCommand {
+    fn from(token: Token) -> Self {
+        match token {
+            Token::Word(s) => BuildInCommand::from(s.as_str()),
+            _ => BuildInCommand::Other(String::new()),
         }
     }
 }
