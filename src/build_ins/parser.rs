@@ -1,17 +1,16 @@
-use std::fmt::Display;
 use crate::build_ins::check::BuildInCommand;
+use std::fmt::Display;
 
-pub struct ParsedCommand{
+pub struct ParsedCommand {
     pub program: BuildInCommand,
     pub arguments: Vec<String>,
 }
 #[derive(Debug, Clone)]
-pub enum Token
-{
+pub enum Token {
     Word(String),
     Pipe(char),
     RedirectOutput,
-    RedirectInput
+    RedirectInput,
 }
 impl Display for Token {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -25,13 +24,13 @@ impl Display for Token {
     }
 }
 
-pub fn parse(input: String)-> Option<ParsedCommand>{
+pub fn parse(input: String) -> Option<ParsedCommand> {
     if input.trim().is_empty() {
         return None;
     }
 
     let tokens = lex(input);
-    Some(ParsedCommand{
+    Some(ParsedCommand {
         program: BuildInCommand::from(tokens[0].clone()),
         arguments: tokens[1..].iter().map(|t| t.to_string()).collect(),
     })
@@ -60,4 +59,3 @@ pub fn lex(input: String) -> Vec<Token> {
     }
     tokens
 }
-

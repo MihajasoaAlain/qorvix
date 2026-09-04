@@ -1,5 +1,5 @@
-use std::fmt::Display;
 use crate::build_ins::Token;
+use std::fmt::Display;
 
 #[derive(Debug)]
 pub enum BuildInCommand {
