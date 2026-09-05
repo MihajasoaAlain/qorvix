@@ -30,10 +30,13 @@ pub fn parse(input: String) -> Option<ParsedCommand> {
     }
 
     let tokens = lex(input);
-    Some(ParsedCommand {
-        program: BuildInCommand::from(tokens[0].clone()),
-        arguments: tokens[1..].iter().map(|t| t.to_string()).collect(),
-    })
+   match parsing(&tokens) {
+        Some(command) => Option::from(ParsedCommand {
+            program: command.program,
+            arguments: command.arguments,
+        }),
+        _ => return None,
+    }
 }
 pub fn lex(input: String) -> Vec<Token> {
     let mut tokens = Vec::new();
@@ -58,4 +61,23 @@ pub fn lex(input: String) -> Vec<Token> {
         tokens.push(Token::Word(current));
     }
     tokens
+}
+
+pub fn parsing(tokens: &[Token]) -> Option<ParsedCommand> {
+let mut words = Vec::new();
+for token in tokens {
+    match token {
+        Token::Word(word) => words.push(word.clone()),
+        _ => (),
+    }
+}
+if words.is_empty() {
+    None
+} else {
+    Some(ParsedCommand {
+        program: BuildInCommand::from(words[0].as_str()),
+        arguments: words[1..].to_vec(),
+    })
+}
+
 }
