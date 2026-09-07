@@ -1,7 +1,7 @@
 use crate::build_ins::Token;
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum BuildInCommand {
     Cd,
     Exit,
