@@ -45,7 +45,7 @@ pub fn execute(parsed_command: parser::ParsedCommand) -> bool {
                 }
                 return false;
             }
-            let path = if parsed_command.arguments.len() > 0 {
+            let path = if !parsed_command.arguments.is_empty() {
                 parsed_command.arguments[0].clone()
             } else {
                 "/".into()
