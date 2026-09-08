@@ -26,9 +26,6 @@ pub fn execute_command() {
         } else {
             parser::execute_pipeline(&parsed_command);
         }
-
-        // let command = input.trim();
-        // let commands = command.split_whitespace().collect::<Vec<&str>>();
     }
 }
 pub fn execute(parsed_command: parser::ParsedCommand) -> bool {
@@ -46,9 +43,13 @@ pub fn execute(parsed_command: parser::ParsedCommand) -> bool {
                 if cd("/").is_err() {
                     eprintln!("{}: failed to change directory", parsed_command.program);
                 }
-                false;
+                return false;
             }
-            let path = parsed_command.arguments[0].clone();
+            let path = if parsed_command.arguments.len() > 0 {
+                parsed_command.arguments[0].clone()
+            } else {
+                "/".into()
+            };
             if cd(path.as_str()).is_err() {
                 eprintln!("{}: failed to change directory", parsed_command.program);
             }
