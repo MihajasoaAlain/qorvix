@@ -16,38 +16,50 @@ pub fn execute_command() {
             Some(cmd) => cmd,
             None => continue,
         };
+        println!("Parsed command: {:?}", parsed_command);
+        if parsed_command.len() == 1 {
+            if execute(parsed_command[0].clone()) {
+                break;
+            } else {
+                continue;
+            }
+        } else {
+            parser::execute_pipeline(&parsed_command);
+        }
 
         // let command = input.trim();
         // let commands = command.split_whitespace().collect::<Vec<&str>>();
-        match parsed_command.program {
-            BuildInCommand::Exit => break,
-            BuildInCommand::Cd => {
-                if parsed_command.arguments.len() > 2 {
-                    eprintln!(
-                        "{:?}: string not in pwd: {}",
-                        parsed_command.program,
-                        parsed_command.arguments.join(" ")
-                    );
-                    continue;
-                }
-                if parsed_command.arguments.is_empty() {
-                    if cd("/").is_err() {
-                        eprintln!("{}: failed to change directory", parsed_command.program);
-                    }
-                    continue;
-                }
-                let path = parsed_command.arguments[0].clone();
-                if cd(path.as_str()).is_err() {
+    }
+}
+pub fn execute(parsed_command: parser::ParsedCommand) -> bool {
+    match parsed_command.program {
+        BuildInCommand::Exit => true,
+        BuildInCommand::Cd => {
+            if parsed_command.arguments.len() > 2 {
+                eprintln!(
+                    "{:?}: string not in pwd: {}",
+                    parsed_command.program,
+                    parsed_command.arguments.join(" ")
+                );
+            }
+            if parsed_command.arguments.is_empty() {
+                if cd("/").is_err() {
                     eprintln!("{}: failed to change directory", parsed_command.program);
                 }
-                continue;
+                false;
             }
-            BuildInCommand::Other(ref cmd) => {
-                match Command::new(cmd).args(&parsed_command.arguments).status() {
-                    Ok(_) => (),
-                    Err(_) => {
-                        eprintln!("{}: command not found", parsed_command.program);
-                    }
+            let path = parsed_command.arguments[0].clone();
+            if cd(path.as_str()).is_err() {
+                eprintln!("{}: failed to change directory", parsed_command.program);
+            }
+            false
+        }
+        BuildInCommand::Other(ref cmd) => {
+            match  Command::new(cmd).args(&parsed_command.arguments).status() {
+                Ok(_) => false,
+                Err(_) => {
+                    eprintln!("{}: command not found", parsed_command.program);
+                    false
                 }
             }
         }
